@@ -1,0 +1,260 @@
+.admin-page {
+  padding: 40px 20px;
+}
+
+.admin-shell {
+  width: min(100%, 760px);
+  margin: 0 auto;
+}
+
+.admin-header,
+.admin-section-heading,
+.admin-link-row,
+.admin-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-header {
+  margin-bottom: 26px;
+}
+
+.admin-brand {
+  color: var(--text);
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.admin-header p,
+.admin-intro,
+.admin-footer {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.admin-back-link,
+.admin-link-url {
+  color: var(--accent-strong);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.admin-panel {
+  padding: clamp(20px, 5vw, 34px);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.admin-panel h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.admin-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.admin-form h2,
+.admin-link-section h2 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.admin-form label {
+  margin-top: 5px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-form input,
+.admin-form select,
+.admin-form textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  outline: none;
+  background: var(--page);
+  color: var(--text);
+}
+
+.admin-form textarea {
+  min-height: 84px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.admin-form input:focus,
+.admin-form select:focus,
+.admin-form textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.admin-primary-button,
+.admin-secondary-button,
+.admin-delete-button {
+  min-height: 40px;
+  padding: 0 15px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-primary-button {
+  background: var(--accent);
+  color: #fff;
+}
+
+.admin-primary-button:hover {
+  background: var(--accent-strong);
+}
+
+.admin-secondary-button {
+  border-color: var(--line);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.admin-delete-button {
+  min-height: 34px;
+  padding: 0 11px;
+  border-color: #f0caca;
+  background: #fff7f7;
+  color: #a33a3a;
+}
+
+.admin-form-actions {
+  justify-content: flex-start;
+  margin-top: 8px;
+}
+
+.admin-link-section {
+  margin-top: 32px;
+}
+
+.admin-link-list {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-link-row {
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.admin-link-details {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+
+.admin-link-name {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-link-description {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.admin-link-url {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-link-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.admin-edit-button {
+  padding: 0 8px;
+  border: 0;
+  background: transparent;
+  color: var(--accent-strong);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+}
+
+.admin-message {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.admin-message.is-error {
+  border-color: #e7b5b5;
+  background: #fff5f5;
+  color: #8d2929;
+}
+
+.admin-empty {
+  margin: 0;
+  padding: 18px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.admin-footer {
+  padding: 18px 2px;
+  line-height: 1.6;
+}
+
+.admin-page button:focus-visible,
+.admin-page a:focus-visible,
+.admin-page input:focus-visible,
+.admin-page select:focus-visible,
+.admin-page textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 520px) {
+  .admin-page {
+    padding: 24px 14px;
+  }
+
+  .admin-header,
+  .admin-section-heading {
+    align-items: flex-start;
+  }
+
+  .admin-link-row {
+    align-items: flex-start;
+  }
+
+  .admin-link-actions {
+    flex-direction: column;
+  }
+}

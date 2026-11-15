@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4f7fb" />
+    <title>网址管理 · Ethan's 导航站</title>
+    <link rel="icon" type="image/jpeg" href="./image/Ethan.jpg" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./admin.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="./supabase-config.js" defer></script>
+    <script src="./admin.js" defer></script>
+  </head>
+  <body class="admin-page">
+    <main class="admin-shell">
+      <header class="admin-header">
+        <div>
+          <a class="admin-brand" href="./index.html">Ethan's 导航站</a>
+          <p>管理导航站中的网址</p>
+        </div>
+        <a class="admin-back-link" href="./index.html">返回首页</a>
+      </header>
+
+      <p class="admin-message" id="admin-message" role="status" aria-live="polite" hidden></p>
+
+      <section class="admin-panel" id="login-panel">
+        <h1>管理员登录</h1>
+        <p class="admin-intro">登录后可以添加、编辑或删除导航网址。</p>
+        <form class="admin-form" id="login-form">
+          <label for="login-email">邮箱</label>
+          <input
+            id="login-email"
+            name="email"
+            type="email"
+            value="EthanPeng820@163.com"
+            autocomplete="username"
+            readonly
+            required
+          />
+          <label for="login-password">密码</label>
+          <input
+            id="login-password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+          <button class="admin-primary-button" type="submit">登录</button>
+        </form>
+      </section>
+
+      <section class="admin-panel" id="dashboard" hidden>
+        <div class="admin-section-heading">
+          <div>
+            <h1>网址管理</h1>
+            <p class="admin-intro">
+              添加或编辑网址时填写名称、分类、网址和简介；网站图标会根据网址自动加载。
+            </p>
+          </div>
+          <button class="admin-secondary-button" id="logout-button" type="button">退出登录</button>
+        </div>
+
+        <form class="admin-form link-form" id="link-form">
+          <h2 id="link-form-title">添加网址</h2>
+          <input id="link-id" name="id" type="hidden" />
+          <label for="link-name">网站名称</label>
+          <input
+            id="link-name"
+            name="name"
+            type="text"
+            maxlength="160"
+            placeholder="例如：GitHub"
+            required
+          />
+          <label for="link-category">网站分类</label>
+          <select id="link-category" name="category" required>
+            <option value="all">全部网站</option>
+            <option value="daily">日常服务</option>
+            <option value="dev">开发技术</option>
+            <option value="study">学习教育</option>
+            <option value="tools">效率工具</option>
+            <option value="design">设计素材</option>
+            <option value="media">影音媒体</option>
+            <option value="games">游戏专区</option>
+          </select>
+          <label for="link-url">网站 URL</label>
+          <input
+            id="link-url"
+            name="url"
+            type="url"
+            inputmode="url"
+            placeholder="https://example.com"
+            required
+          />
+          <label for="link-description">网站简介</label>
+          <textarea
+            id="link-description"
+            name="description"
+            rows="3"
+            maxlength="500"
+            placeholder="手动填写这个网站的用途或简介"
+            required
+          ></textarea>
+          <div class="admin-form-actions">
+            <button class="admin-primary-button" id="save-link-button" type="submit">
+              添加网址
+            </button>
+            <button
+              class="admin-secondary-button"
+              id="cancel-edit-button"
+              type="button"
+              hidden
+            >
+              取消编辑
+            </button>
+          </div>
+        </form>
+
+        <section class="admin-link-section" aria-labelledby="links-heading">
+          <h2 id="links-heading">已保存的网址</h2>
+          <div class="admin-link-list" id="admin-link-list"></div>
+        </section>
+      </section>
+
+      <footer class="admin-footer">
+        首次使用前请在 Supabase SQL Editor 执行项目中的
+        <code>supabase-metadata-migration.sql</code>，为网址表添加分类和简介字段。
+        前端仅使用 anon key；数据库权限由 Supabase RLS 策略控制。
+      </footer>
+    </main>
+  </body>
+</html>

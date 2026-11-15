@@ -559,6 +559,23 @@ body.sidebar-collapsed {
   font-size: 11px;
 }
 
+.data-status {
+  margin: 0 0 16px;
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.data-status.is-error {
+  border-color: #e7b5b5;
+  color: #9a3030;
+}
+
 /* 网格列数在下方的响应式断点中调整。 */
 .bookmark-grid {
   display: grid;
@@ -706,9 +723,23 @@ body.sidebar-collapsed {
 }
 
 .footer-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
   font-family: "DM Sans", sans-serif;
   font-size: 9px;
   letter-spacing: 0.13em;
+}
+
+.admin-link {
+  color: var(--muted);
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.admin-link:hover {
+  color: var(--accent-strong);
 }
 
 .footer-right span {
