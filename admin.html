@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f4f7fb" />
+    <meta name="theme-color" content="#f6f8fa" />
     <title>网址管理 · Ethan's 导航站</title>
     <link rel="icon" type="image/jpeg" href="./image/Ethan.jpg" />
     <link rel="stylesheet" href="./styles.css" />
@@ -15,20 +15,28 @@
   <body class="admin-page">
     <main class="admin-shell">
       <header class="admin-header">
-        <div>
-          <a class="admin-brand" href="./index.html">Ethan's 导航站</a>
-          <p>管理导航站中的网址</p>
+        <div class="admin-brand-group">
+          <span class="admin-brand-mark" aria-hidden="true">E</span>
+          <div>
+            <a class="admin-brand" href="./index.html">Ethan's 导航站</a>
+            <p>管理控制台</p>
+          </div>
         </div>
-        <a class="admin-back-link" href="./index.html">返回首页</a>
+        <div class="admin-header-actions">
+          <span class="admin-live-status"><span aria-hidden="true"></span>数据管理面板</span>
+          <a class="admin-back-link" href="./index.html">访问网站 <span aria-hidden="true">↗</span></a>
+        </div>
       </header>
 
       <p class="admin-message" id="admin-message" role="status" aria-live="polite" hidden></p>
 
-      <section class="admin-panel" id="login-panel">
-        <h1>管理员登录</h1>
-        <p class="admin-intro">登录后可以添加、编辑或删除导航网址。</p>
+      <section class="admin-panel admin-login-panel" id="login-panel">
+        <div class="admin-login-icon" aria-hidden="true">🔐</div>
+        <span class="admin-eyebrow">ADMIN CONSOLE</span>
+        <h1>欢迎回来</h1>
+        <p class="admin-intro">登录以管理导航站内容和查看数据概览。</p>
         <form class="admin-form" id="login-form">
-          <label for="login-email">邮箱</label>
+          <label for="login-email">管理员邮箱</label>
           <input
             id="login-email"
             name="email"
@@ -44,88 +52,167 @@
             name="password"
             type="password"
             autocomplete="current-password"
+            placeholder="请输入管理员密码"
             required
           />
-          <button class="admin-primary-button" type="submit">登录</button>
+          <button class="admin-primary-button" type="submit">
+            安全登录 <span aria-hidden="true">→</span>
+          </button>
         </form>
+        <p class="admin-login-note">🔒 登录状态由 Supabase Auth 安全保护</p>
       </section>
 
-      <section class="admin-panel" id="dashboard" hidden>
-        <div class="admin-section-heading">
+      <section class="admin-dashboard" id="dashboard" hidden>
+        <div class="admin-dashboard-heading">
           <div>
-            <h1>网址管理</h1>
-            <p class="admin-intro">
-              添加或编辑网址时填写名称、分类、网址和简介；网站图标会根据网址自动加载。
-            </p>
+            <span class="admin-eyebrow">OVERVIEW</span>
+            <h1>数据概览</h1>
+            <p class="admin-intro">欢迎回来，这里是导航站的运营概况。</p>
           </div>
-          <button class="admin-secondary-button" id="logout-button" type="button">退出登录</button>
+          <div class="admin-dashboard-actions">
+            <a class="admin-secondary-button" href="./index.html">查看网站 <span aria-hidden="true">↗</span></a>
+            <button class="admin-secondary-button" id="logout-button" type="button">退出登录</button>
+          </div>
         </div>
 
-        <form class="admin-form link-form" id="link-form">
-          <h2 id="link-form-title">添加网址</h2>
-          <input id="link-id" name="id" type="hidden" />
-          <label for="link-name">网站名称</label>
-          <input
-            id="link-name"
-            name="name"
-            type="text"
-            maxlength="160"
-            placeholder="例如：GitHub"
-            required
-          />
-          <label for="link-category">网站分类</label>
-          <select id="link-category" name="category" required>
-            <option value="all">全部网站</option>
-            <option value="daily">日常服务</option>
-            <option value="dev">开发技术</option>
-            <option value="study">学习教育</option>
-            <option value="tools">效率工具</option>
-            <option value="design">设计素材</option>
-            <option value="media">影音媒体</option>
-            <option value="games">游戏专区</option>
-          </select>
-          <label for="link-url">网站 URL</label>
-          <input
-            id="link-url"
-            name="url"
-            type="url"
-            inputmode="url"
-            placeholder="https://example.com"
-            required
-          />
-          <label for="link-description">网站简介</label>
-          <textarea
-            id="link-description"
-            name="description"
-            rows="3"
-            maxlength="500"
-            placeholder="手动填写这个网站的用途或简介"
-            required
-          ></textarea>
-          <div class="admin-form-actions">
-            <button class="admin-primary-button" id="save-link-button" type="submit">
-              添加网址
-            </button>
-            <button
-              class="admin-secondary-button"
-              id="cancel-edit-button"
-              type="button"
-              hidden
-            >
-              取消编辑
-            </button>
-          </div>
-        </form>
+        <div class="admin-metric-grid" aria-label="网址统计">
+          <article class="admin-metric-card">
+            <div class="admin-metric-top">
+              <span>已收录网站</span>
+              <span class="admin-metric-icon is-blue" aria-hidden="true">↗</span>
+            </div>
+            <strong id="metric-active-links">—</strong>
+            <small>当前公开展示</small>
+          </article>
+          <article class="admin-metric-card">
+            <div class="admin-metric-top">
+              <span>累计访问</span>
+              <span class="admin-metric-icon is-green" aria-hidden="true">◉</span>
+            </div>
+            <strong id="metric-total-clicks">—</strong>
+            <small>含回收站记录的累计点击</small>
+          </article>
+          <article class="admin-metric-card">
+            <div class="admin-metric-top">
+              <span>分类数量</span>
+              <span class="admin-metric-icon is-purple" aria-hidden="true">▦</span>
+            </div>
+            <strong id="metric-category-count">—</strong>
+            <small>已使用的网站分类</small>
+          </article>
+          <article class="admin-metric-card">
+            <div class="admin-metric-top">
+              <span>回收站</span>
+              <span class="admin-metric-icon is-orange" aria-hidden="true">▤</span>
+            </div>
+            <strong id="metric-trash-links">—</strong>
+            <small>可恢复的网址</small>
+          </article>
+        </div>
 
-        <section class="admin-link-section" aria-labelledby="links-heading">
-          <h2 id="links-heading">已保存的网址</h2>
-          <div class="admin-link-list" id="admin-link-list"></div>
-        </section>
+        <div class="admin-insight-grid">
+          <section class="admin-panel admin-insight-panel" aria-labelledby="category-chart-heading">
+            <div class="admin-panel-heading">
+              <div>
+                <h2 id="category-chart-heading">分类收录概览</h2>
+                <p>各分类当前收录网站数量</p>
+              </div>
+              <span class="admin-panel-badge">分类分布</span>
+            </div>
+            <div class="admin-category-chart" id="admin-category-chart"></div>
+          </section>
+
+          <section class="admin-panel admin-insight-panel" aria-labelledby="popular-links-heading">
+            <div class="admin-panel-heading">
+              <div>
+                <h2 id="popular-links-heading">热门网站</h2>
+                <p>按累计访问次数排序</p>
+              </div>
+              <span class="admin-panel-badge">TOP 3</span>
+            </div>
+            <div class="admin-popular-list" id="admin-popular-links"></div>
+          </section>
+        </div>
+
+        <div class="admin-management-grid">
+          <section class="admin-panel admin-link-section" aria-labelledby="links-heading">
+            <div class="admin-link-section-heading">
+              <div>
+                <span class="admin-eyebrow">CONTENT</span>
+                <h2 id="links-heading">已收录的网址</h2>
+              </div>
+              <div class="admin-view-switch" role="group" aria-label="网址列表">
+                <button class="admin-view-button is-active" data-link-view="active" type="button" aria-pressed="true">
+                  已收录
+                </button>
+                <button class="admin-view-button" data-link-view="trash" type="button" aria-pressed="false">
+                  回收站
+                </button>
+              </div>
+            </div>
+            <div class="admin-link-list" id="admin-link-list"></div>
+          </section>
+
+          <section class="admin-panel admin-create-panel" aria-labelledby="link-form-title">
+            <div class="admin-panel-heading">
+              <div>
+                <span class="admin-eyebrow">QUICK ACTION</span>
+                <h2 id="link-form-title">添加网址</h2>
+              </div>
+              <span class="admin-create-icon" aria-hidden="true">＋</span>
+            </div>
+            <form class="admin-form link-form" id="link-form">
+              <input id="link-id" name="id" type="hidden" />
+              <label for="link-name">网站名称</label>
+              <input
+                id="link-name"
+                name="name"
+                type="text"
+                maxlength="160"
+                placeholder="例如：GitHub"
+                required
+              />
+              <label for="link-category">网站分类</label>
+              <select id="link-category" name="category" required>
+                <option value="all">全部网站</option>
+                <option value="daily">日常服务</option>
+                <option value="dev">开发技术</option>
+                <option value="study">学习教育</option>
+                <option value="tools">效率工具</option>
+                <option value="design">设计素材</option>
+                <option value="media">影音媒体</option>
+                <option value="games">游戏专区</option>
+              </select>
+              <label for="link-url">网站 URL</label>
+              <input
+                id="link-url"
+                name="url"
+                type="url"
+                inputmode="url"
+                placeholder="https://example.com"
+                required
+              />
+              <label for="link-description">网站简介</label>
+              <textarea
+                id="link-description"
+                name="description"
+                rows="3"
+                maxlength="500"
+                placeholder="填写这个网站的用途或简介"
+                required
+              ></textarea>
+              <div class="admin-form-actions">
+                <button class="admin-primary-button" id="save-link-button" type="submit">添加网址</button>
+                <button class="admin-secondary-button" id="cancel-edit-button" type="button" hidden>取消编辑</button>
+              </div>
+            </form>
+          </section>
+        </div>
       </section>
 
       <footer class="admin-footer">
         首次使用前请在 Supabase SQL Editor 执行项目中的
-        <code>supabase-metadata-migration.sql</code>，为网址表添加分类和简介字段。
+        <code>supabase-metadata-migration.sql</code>，添加分类、简介、收录时间、访问统计、回收站及 RLS 策略。
         前端仅使用 anon key；数据库权限由 Supabase RLS 策略控制。
       </footer>
     </main>

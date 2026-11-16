@@ -1,13 +1,13 @@
 // 分类 id 必须和下方网站数据里的 category 值对应；修改名称不会影响筛选。
 const categories = [
-  { id: "all", label: "全部网站", icon: "⌂" },
-  { id: "daily", label: "日常服务", icon: "◷" },
-  { id: "dev", label: "开发技术", icon: "⌘" },
-  { id: "study", label: "学习教育", icon: "▤" },
-  { id: "tools", label: "效率工具", icon: "⚙" },
-  { id: "design", label: "设计素材", icon: "◈" },
-  { id: "media", label: "影音媒体", icon: "▶" },
-  { id: "games", label: "游戏专区", icon: "◇" },
+  { id: "all", label: "全部网站", icon: "🏠" },
+  { id: "daily", label: "日常服务", icon: "☀️" },
+  { id: "dev", label: "开发技术", icon: "💻" },
+  { id: "study", label: "学习教育", icon: "📚" },
+  { id: "tools", label: "效率工具", icon: "🧰" },
+  { id: "design", label: "设计素材", icon: "🎨" },
+  { id: "media", label: "影音媒体", icon: "🎬" },
+  { id: "games", label: "游戏专区", icon: "🎮" },
 ];
 
 // 书签内容会从 Supabase 的 links 表读取，不再在前端维护静态网站列表。
@@ -124,6 +124,8 @@ async function loadBookmarks() {
     ({ data, error } = await supabaseClient
       .from("links")
       .select("*")
+      .is("deleted_at", null)
+      .order("click_count", { ascending: false })
       .order("created_at", { ascending: false }));
   } catch (requestError) {
     dataStatus.textContent = `加载失败：${requestError.message}`;
@@ -183,7 +185,7 @@ function getVisibleBookmarks() {
 // 重绘书签卡片，并尝试读取每个网站自己的 favicon。
 function renderBookmarks() {
   const visibleBookmarks = getVisibleBookmarks();
-  const cards = visibleBookmarks.map(({ name, description, url, iconUrl, icon, tags }) => {
+  const cards = visibleBookmarks.map(({ id, name, description, url, iconUrl, icon, tags }) => {
     const website = new URL(url);
     const safeName = escapeHtml(name);
     const safeDescription = escapeHtml(description);
@@ -199,6 +201,7 @@ function renderBookmarks() {
     return `
       <a
         class="bookmark-card"
+        data-link-id="${escapeHtml(id)}"
         href="${safeUrl}"
         target="_blank"
         rel="noopener noreferrer"
@@ -226,6 +229,12 @@ function renderBookmarks() {
   });
   bookmarkGrid.innerHTML = cards.join("");
 
+  bookmarkGrid.querySelectorAll(".bookmark-card").forEach((card) => {
+    card.addEventListener("click", () => {
+      recordBookmarkClick(card.dataset.linkId);
+    });
+  });
+
   // 网站没有 /favicon.ico 时，再从备用图标服务按域名获取；都失败时保留文字图标。
   bookmarkGrid.querySelectorAll(".bookmark-favicon").forEach((image) => {
     image.addEventListener("load", () => {
@@ -251,6 +260,21 @@ function renderBookmarks() {
       : "数据库中还没有网址，请先通过管理后台添加。";
   }
   bookmarkGrid.hidden = visibleBookmarks.length === 0;
+}
+
+async function recordBookmarkClick(linkId) {
+  try {
+    const { data, error } = await supabaseClient.rpc("increment_link_click", {
+      link_id: linkId,
+    });
+    if (error) throw error;
+    if (data !== true) throw new Error("网址已移入回收站，未记录访问次数。");
+  } catch (error) {
+    console.error("记录网址访问次数失败：", error);
+    dataStatus.textContent = `访问次数记录失败：${error.message}`;
+    dataStatus.hidden = false;
+    dataStatus.classList.add("is-error");
+  }
 }
 
 // 更新公历、农历和数字时间。每秒调用一次以显示秒数。
