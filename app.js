@@ -24,11 +24,22 @@ const supabaseClient = window.supabase?.createClient && window.SUPABASE_CONFIG
 const categoryNav = document.querySelector("#category-nav");
 const bookmarkGrid = document.querySelector("#bookmark-grid");
 const linkCount = document.querySelector("#link-count");
+const directoryTitle = document.querySelector("#directory-title");
 const emptyState = document.querySelector("#empty-state");
 const dataStatus = document.querySelector("#data-status");
 const searchInput = document.querySelector("#site-search");
 const searchForm = document.querySelector("#search-form");
 const sidebarToggle = document.querySelector("#sidebar-toggle");
+const sidebarSearchExpand = document.querySelector(".sidebar-search-expand");
+const webSearchForm = document.querySelector("#web-search-form");
+const webSearchEngine = document.querySelector("#web-search-engine");
+const webSearchQuery = document.querySelector("#web-search-query");
+const externalSearchSources = new Map([
+  ["bing", { action: "https://www.bing.com/search", parameter: "q" }],
+  ["baidu", { action: "https://www.baidu.com/s", parameter: "wd" }],
+  ["google", { action: "https://www.google.com/search", parameter: "q" }],
+  ["yandex", { action: "https://yandex.com/search/", parameter: "text" }],
+]);
 let bookmarks = [];
 let selectedCategory = "all";
 let searchQuery = "";
@@ -46,8 +57,21 @@ function setSidebarCollapsed(isCollapsed) {
   sidebarToggle.title = sidebarCollapsed ? "展开侧边栏" : "收起侧边栏";
 }
 
+function setExternalSearchSource(sourceId) {
+  const selectedSource = externalSearchSources.has(sourceId) ? sourceId : "bing";
+  const source = externalSearchSources.get(selectedSource);
+  webSearchEngine.value = selectedSource;
+  webSearchForm.action = source.action;
+  webSearchQuery.name = source.parameter;
+  localStorage.setItem("navigation-hub-search-source", selectedSource);
+}
+
 // 根据 categories 数据生成左侧分类按钮。
 function renderCategories() {
+  const selectedCategoryInfo = categories.find(({ id }) => id === selectedCategory);
+  directoryTitle.textContent = selectedCategory === "all"
+    ? "常用网站"
+    : selectedCategoryInfo?.label || "常用网站";
   categoryNav.innerHTML = categories
     .map(
       ({ id, label, icon }) => `
@@ -78,7 +102,7 @@ function escapeHtml(value) {
   })[character]);
 }
 
-// 读取数据库内容；图标优先使用网站根目录下的 favicon.ico。
+// 读取数据库内容；站点 favicon 加载失败时回退为分类图标。
 function normalizeBookmark(row) {
   const name = String(row.name || "").trim();
   if (!name) return null;
@@ -87,15 +111,15 @@ function normalizeBookmark(row) {
     const website = new URL(String(row.url || "").trim());
     if (!["http:", "https:"].includes(website.protocol)) return null;
 
+    const category = categories.some(({ id }) => id === row.category) ? row.category : "all";
     return {
       id: String(row.id),
       name,
       description: String(row.description || "").trim() || `网站入口 · ${website.hostname}`,
       url: website.href,
       iconUrl: `${website.origin}/favicon.ico`,
-      category: categories.some(({ id }) => id === row.category) ? row.category : "all",
-      tags: [],
-      icon: name.slice(0, 2),
+      category,
+      icon: categories.find(({ id }) => id === category)?.icon || categories[0].icon,
     };
   } catch {
     return null;
@@ -167,7 +191,7 @@ async function loadBookmarks() {
   renderBookmarks();
 }
 
-// 按当前分类和搜索词筛选书签；名称、简介、网址和标签都可搜索。
+// 按当前分类和搜索词筛选书签。
 function getVisibleBookmarks() {
   const query = searchQuery.trim().toLocaleLowerCase();
   return bookmarks.filter((bookmark) => {
@@ -175,28 +199,22 @@ function getVisibleBookmarks() {
       selectedCategory === "all" || bookmark.category === selectedCategory;
     const matchesSearch =
       !query ||
-      `${bookmark.name} ${bookmark.description} ${bookmark.url} ${bookmark.tags.join(" ")}`
+      `${bookmark.name} ${bookmark.description} ${bookmark.url}`
         .toLocaleLowerCase()
         .includes(query);
     return matchesCategory && matchesSearch;
   });
 }
 
-// 重绘书签卡片，并尝试读取每个网站自己的 favicon。
+// 重绘书签卡片，并在网站图标不可用时显示分类图标。
 function renderBookmarks() {
   const visibleBookmarks = getVisibleBookmarks();
-  const cards = visibleBookmarks.map(({ id, name, description, url, iconUrl, icon, tags }) => {
+  const cards = visibleBookmarks.map(({ id, name, description, url, iconUrl, icon }) => {
     const website = new URL(url);
     const safeName = escapeHtml(name);
     const safeDescription = escapeHtml(description);
     const safeUrl = escapeHtml(website.href);
     const safeFavicon = escapeHtml(iconUrl);
-    const safeIcon = escapeHtml(icon);
-    const tagList = tags.length
-      ? `<span class="bookmark-tags">${tags
-          .map((tag) => `<span class="bookmark-tag">${escapeHtml(tag)}</span>`)
-          .join("")}</span>`
-      : "";
 
     return `
       <a
@@ -216,12 +234,11 @@ function renderBookmarks() {
             loading="lazy"
             referrerpolicy="no-referrer"
           />
-          <span class="bookmark-fallback">${safeIcon}</span>
+          <span class="bookmark-fallback">${icon}</span>
         </span>
         <span class="bookmark-info">
           <span class="bookmark-name">${safeName}</span>
           <span class="bookmark-description">${safeDescription}</span>
-          ${tagList}
         </span>
         <span class="bookmark-arrow" aria-hidden="true">↗</span>
       </a>
@@ -235,7 +252,6 @@ function renderBookmarks() {
     });
   });
 
-  // 网站没有 /favicon.ico 时，再从备用图标服务按域名获取；都失败时保留文字图标。
   bookmarkGrid.querySelectorAll(".bookmark-favicon").forEach((image) => {
     image.addEventListener("load", () => {
       image.closest(".bookmark-icon").classList.add("has-favicon");
@@ -429,6 +445,15 @@ sidebarToggle.addEventListener("click", () => {
   setSidebarCollapsed(!sidebarCollapsed);
 });
 
+sidebarSearchExpand.addEventListener("click", () => {
+  setSidebarCollapsed(false);
+  searchInput.focus();
+});
+
+webSearchEngine.addEventListener("change", () => {
+  setExternalSearchSource(webSearchEngine.value);
+});
+
 // 输入时即时筛选；提交时则打开 Google 网页搜索。
 searchInput.addEventListener("input", () => {
   searchQuery = searchInput.value;
@@ -456,10 +481,13 @@ document.querySelector("#theme-toggle").addEventListener("click", () => {
   localStorage.setItem("shiguang-theme", isDark ? "dark" : "light");
 });
 
+setExternalSearchSource(localStorage.getItem("navigation-hub-search-source") || "bing");
+
 // Ctrl/⌘ + K 聚焦搜索框；Esc 清空搜索并恢复全部书签。
 document.addEventListener("keydown", (event) => {
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
     event.preventDefault();
+    if (sidebarCollapsed) setSidebarCollapsed(false);
     searchInput.focus();
   }
   if (event.key === "Escape" && document.activeElement === searchInput) {

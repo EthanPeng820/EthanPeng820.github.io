@@ -8,42 +8,128 @@
       name="description"
       content="一个简洁、可搜索的个人网址导航页，把常用的网站和灵感放在一起。"
     />
-    <meta name="theme-color" content="#f4f7fb" />
-    <title>NAVIGATION HUB</title>
+    <meta name="theme-color" content="#ffffff" />
+    <title>Navigation Hub</title>
 
-    <!-- 字体和页面样式；defer 表示 HTML 解析完成后再执行脚本。 -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <!-- 样式与脚本均使用同目录相对路径，兼容 GitHub Pages 项目子路径。 -->
     <link rel="stylesheet" href="./styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="./supabase-config.js" defer></script>
     <script src="./app.js" defer></script>
   </head>
   <body>
-    <!-- 固定侧边栏：品牌、由 JavaScript 生成的分类，以及展开/收起按钮。 -->
-    <aside class="sidebar" id="sidebar" aria-label="导航侧边栏">
+    <header class="topbar">
       <a class="brand" href="#" aria-label="Ethan's 导航站首页">
         <span class="brand-mark" aria-hidden="true">E</span>
         <span class="brand-copy">
-          <span class="brand-name">NAVIGATION HUB</span>
+          <span class="brand-name">Navigation Hub</span>
           <span class="brand-caption">Ethan Peng</span>
         </span>
       </a>
 
+      <section class="web-search-section" aria-label="外部搜索">
+        <form class="web-search-box" id="web-search-form" role="search" target="_blank" rel="noopener">
+          <label class="visually-hidden" for="web-search-engine">搜索引擎</label>
+          <select id="web-search-engine" aria-label="选择搜索源">
+            <option value="bing">必应</option>
+            <option value="baidu">百度</option>
+            <option value="google">Google</option>
+            <option value="yandex">Yandex</option>
+          </select>
+          <label class="visually-hidden" for="web-search-query">搜索全网</label>
+          <input
+            id="web-search-query"
+            type="search"
+            name="q"
+            placeholder="搜索全网..."
+            autocomplete="off"
+          />
+          <button class="web-search-submit" type="submit">搜索</button>
+        </form>
+      </section>
+
+      <div class="topbar-right">
+        <div class="live-clock" aria-label="当前公历日期、农历和时间">
+          <div class="clock-column clock-date-column">
+            <span class="clock-label">公历日期</span>
+            <span class="clock-date clock-value" id="clock-date"></span>
+            <span class="clock-lunar" id="clock-lunar"></span>
+          </div>
+          <span class="clock-divider" aria-hidden="true"></span>
+          <div class="clock-column clock-time-column">
+            <span class="clock-label">当前时间</span>
+            <time class="clock-time clock-value" id="clock-time"></time>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 固定侧边栏：分类由 JavaScript 生成，支持展开/收起。 -->
+    <aside class="sidebar" id="sidebar" aria-label="导航侧边栏">
+      <section class="sidebar-search-section" aria-label="站内搜索">
+        <form class="search-box" id="search-form" role="search">
+          <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="10.8" cy="10.8" r="6.8"></circle>
+            <path d="m16 16 4.3 4.3"></path>
+          </svg>
+          <label class="visually-hidden" for="site-search">搜索书签或网页</label>
+          <input
+            id="site-search"
+            type="search"
+            placeholder="搜索书签或网页..."
+            autocomplete="off"
+          />
+          <button class="search-submit" type="submit">
+            GO! <span aria-hidden="true">↗</span>
+          </button>
+          <button class="sidebar-search-expand" type="button" aria-label="展开侧边栏并搜索" title="展开侧边栏并搜索">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="10.8" cy="10.8" r="6.8"></circle>
+              <path d="m16 16 4.3 4.3"></path>
+            </svg>
+          </button>
+        </form>
+      </section>
       <div class="sidebar-section-label">分类导航</div>
       <nav class="category-nav" id="category-nav" aria-label="书签分类"></nav>
 
       <div class="sidebar-bottom">
+        <div class="sidebar-tools">
+          <a
+            class="sidebar-github-link"
+            href="https://github.com/EthanPeng820/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="访问 EthanPeng820 的 GitHub 主页"
+            title="GitHub 主页"
+          >
+            <span class="sidebar-github-icon" aria-hidden="true">GH</span>
+            <span class="sidebar-tool-label">GitHub 主页</span>
+            <span class="sidebar-link-arrow" aria-hidden="true">↗</span>
+          </a>
+          <button
+            class="icon-button theme-toggle"
+            id="theme-toggle"
+            type="button"
+            aria-label="切换深色主题"
+            title="切换深色主题"
+          >
+            <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="3.8"></circle>
+              <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+            </svg>
+            <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20.2 15.1A8.4 8.4 0 0 1 8.9 3.8a8.6 8.6 0 1 0 11.3 11.3Z"></path>
+            </svg>
+            <span class="sidebar-tool-label">切换主题</span>
+          </button>
+        </div>
         <div class="sidebar-profile">
           <span class="profile-avatar" aria-hidden="true">E</span>
-          <span class="profile-copy">
-            <span>Ethan's space</span>
-            <small>Personal links</small>
-          </span>
+          <div class="profile-info">
+            <span class="profile-name">Ethan Peng</span>
+            <span class="profile-caption">导航站管理员</span>
+          </div>
         </div>
         <button
           class="sidebar-toggle"
@@ -60,68 +146,15 @@
       </div>
     </aside>
 
-    <!-- 主工作区：搜索、日期时间、书签卡片和页脚。 -->
+    <!-- 主工作区：书签卡片。 -->
     <div class="workspace">
-      <header class="topbar">
-        <!-- 搜索会同时筛选本地书签；提交表单时还会打开网页搜索。 -->
-        <section class="search-section" aria-label="搜索">
-          <form class="search-box" id="search-form" role="search">
-            <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="10.8" cy="10.8" r="6.8"></circle>
-              <path d="m16 16 4.3 4.3"></path>
-            </svg>
-            <label class="visually-hidden" for="site-search">搜索书签或网页</label>
-            <input
-              id="site-search"
-              type="search"
-              placeholder="搜索书签或网页..."
-              autocomplete="off"
-            />
-            <button class="search-submit" type="submit">
-              GO! <span aria-hidden="true">↗</span>
-            </button>
-          </form>
-        </section>
-
-        <!-- 公历、农历和当前时间由 app.js 每秒更新。 -->
-        <div class="topbar-right">
-          <div class="live-clock" aria-label="当前公历日期、农历和时间">
-            <div class="clock-column clock-date-column">
-              <span class="clock-label">公历日期</span>
-              <span class="clock-date clock-value" id="clock-date"></span>
-              <span class="clock-lunar" id="clock-lunar"></span>
-            </div>
-            <span class="clock-divider" aria-hidden="true"></span>
-            <div class="clock-column clock-time-column">
-              <span class="clock-label">当前时间</span>
-              <time class="clock-time clock-value" id="clock-time"></time>
-            </div>
-          </div>
-          <button
-            class="icon-button theme-toggle"
-            id="theme-toggle"
-            type="button"
-            aria-label="切换深色主题"
-            title="切换深色主题"
-          >
-            <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="12" cy="12" r="3.8"></circle>
-              <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
-            </svg>
-            <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M20.2 15.1A8.4 8.4 0 0 1 8.9 3.8a8.6 8.6 0 1 0 11.3 11.3Z"></path>
-            </svg>
-          </button>
-        </div>
-      </header>
-
       <main class="main-content">
         <!-- 书签卡片由 app.js 根据分类和搜索词动态填入。 -->
         <section class="directory-section" aria-label="网址导航">
           <div class="directory-heading">
             <div>
               <span class="section-kicker">QUICK ACCESS</span>
-              <h2>常用网站</h2>
+              <h2 id="directory-title">常用网站</h2>
             </div>
             <span class="link-count" id="link-count"></span>
           </div>
@@ -131,14 +164,6 @@
         </section>
       </main>
 
-      <!-- 页脚的静态说明。 -->
-      <footer class="footer">
-        <span>用一点点时间，整理自己的互联网。</span>
-        <span class="footer-right">
-          <a class="admin-link" href="./admin.html">管理后台</a>
-          <span>MADE FOR YOUR EVERYDAY <span aria-hidden="true">✳</span></span>
-        </span>
-      </footer>
     </div>
   </body>
 </html>

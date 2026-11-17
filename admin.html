@@ -4,8 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f6f8fa" />
-    <title>网址管理 · Ethan's 导航站</title>
-    <link rel="icon" type="image/jpeg" href="./image/Ethan.jpg" />
+    <title>Navigation Hub网址管理</title>
     <link rel="stylesheet" href="./styles.css" />
     <link rel="stylesheet" href="./admin.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
@@ -18,13 +17,16 @@
         <div class="admin-brand-group">
           <span class="admin-brand-mark" aria-hidden="true">E</span>
           <div>
-            <a class="admin-brand" href="./index.html">Ethan's 导航站</a>
+            <a class="admin-brand" href="./index.html">Ethan's Navigation Hub</a>
             <p>管理控制台</p>
           </div>
         </div>
         <div class="admin-header-actions">
           <span class="admin-live-status"><span aria-hidden="true"></span>数据管理面板</span>
-          <a class="admin-back-link" href="./index.html">访问网站 <span aria-hidden="true">↗</span></a>
+          <button class="admin-theme-toggle" id="admin-theme-toggle" type="button" aria-label="切换深色主题" title="切换深色主题">
+            <span class="admin-theme-sun" aria-hidden="true">☀</span>
+            <span class="admin-theme-moon" aria-hidden="true">☾</span>
+          </button>
         </div>
       </header>
 
@@ -41,9 +43,7 @@
             id="login-email"
             name="email"
             type="email"
-            value="EthanPeng820@163.com"
             autocomplete="username"
-            readonly
             required
           />
           <label for="login-password">密码</label>
@@ -150,6 +150,20 @@
                 </button>
               </div>
             </div>
+            <div class="admin-data-actions">
+              <button class="admin-secondary-button" id="export-backup-button" type="button">下载 JSON 备份</button>
+              <button class="admin-secondary-button" id="import-backup-button" type="button">导入 JSON 备份</button>
+              <input id="backup-file-input" type="file" accept="application/json,.json" hidden />
+            </div>
+            <div class="admin-bulk-actions" id="admin-bulk-actions" hidden>
+              <label class="admin-select-all">
+                <input id="select-visible-links" type="checkbox" />
+                <span>选择当前列表</span>
+              </label>
+              <span class="admin-selection-count" id="selection-count">已选 0 项</span>
+              <button class="admin-delete-button" id="bulk-trash-button" type="button">批量移入回收站</button>
+              <button class="admin-delete-button" id="bulk-permanent-delete-button" type="button" hidden>批量永久删除</button>
+            </div>
             <div class="admin-link-list" id="admin-link-list"></div>
           </section>
 
@@ -209,12 +223,6 @@
           </section>
         </div>
       </section>
-
-      <footer class="admin-footer">
-        首次使用前请在 Supabase SQL Editor 执行项目中的
-        <code>supabase-metadata-migration.sql</code>，添加分类、简介、收录时间、访问统计、回收站及 RLS 策略。
-        前端仅使用 anon key；数据库权限由 Supabase RLS 策略控制。
-      </footer>
     </main>
   </body>
 </html>

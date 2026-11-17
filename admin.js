@@ -7,6 +7,7 @@ const supabaseClient = window.supabase?.createClient && window.SUPABASE_CONFIG
   : null;
 
 const ADMIN_EMAIL = "EthanPeng820@163.com";
+const SESSION_DATE_KEY = "navigation-hub-admin-session-date";
 const loginPanel = document.querySelector("#login-panel");
 const dashboard = document.querySelector("#dashboard");
 const loginForm = document.querySelector("#login-form");
@@ -22,6 +23,15 @@ const linkFormTitle = document.querySelector("#link-form-title");
 const saveLinkButton = document.querySelector("#save-link-button");
 const cancelEditButton = document.querySelector("#cancel-edit-button");
 const linkViewButtons = [...document.querySelectorAll("[data-link-view]")];
+const themeToggle = document.querySelector("#admin-theme-toggle");
+const bulkActions = document.querySelector("#admin-bulk-actions");
+const selectionCount = document.querySelector("#selection-count");
+const selectVisibleLinks = document.querySelector("#select-visible-links");
+const bulkTrashButton = document.querySelector("#bulk-trash-button");
+const bulkPermanentDeleteButton = document.querySelector("#bulk-permanent-delete-button");
+const exportBackupButton = document.querySelector("#export-backup-button");
+const importBackupButton = document.querySelector("#import-backup-button");
+const backupFileInput = document.querySelector("#backup-file-input");
 const categoryLabels = new Map([
   ["all", "全部网站"],
   ["daily", "日常服务"],
@@ -44,21 +54,85 @@ const categoryIcons = new Map([
 ]);
 let links = [];
 let currentLinkView = "active";
+let dailyLogoutTimer = null;
+let messageTimer = null;
+const selectedLinkIds = new Set();
 
 function showMessage(message, isError = false) {
+  window.clearTimeout(messageTimer);
   adminMessage.textContent = message;
   adminMessage.hidden = !message;
   adminMessage.classList.toggle("is-error", isError);
+  if (message) {
+    messageTimer = window.setTimeout(() => {
+      adminMessage.hidden = true;
+      adminMessage.textContent = "";
+    }, 3000);
+  }
+}
+
+function setTheme(isDark) {
+  document.body.classList.toggle("dark-theme", isDark);
+  themeToggle.setAttribute("aria-label", isDark ? "切换浅色主题" : "切换深色主题");
+  themeToggle.title = isDark ? "切换浅色主题" : "切换深色主题";
+  document.querySelector('meta[name="theme-color"]').content = isDark ? "#0d1117" : "#f6f8fa";
+  localStorage.setItem("shiguang-theme", isDark ? "dark" : "light");
 }
 
 function setAuthenticated(isAuthenticated) {
   loginPanel.hidden = isAuthenticated;
   dashboard.hidden = !isAuthenticated;
   showMessage("");
+  window.clearTimeout(dailyLogoutTimer);
+  if (isAuthenticated) scheduleDailyLogout();
 }
 
 function isAdminSession(session) {
   return session?.user?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+}
+
+function getLocalDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function scheduleDailyLogout() {
+  const now = new Date();
+  const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  dailyLogoutTimer = window.setTimeout(() => {
+    void logoutAtMidnight();
+  }, midnight.getTime() - now.getTime());
+}
+
+async function logoutAtMidnight() {
+  const sessionDate = localStorage.getItem(SESSION_DATE_KEY);
+  if (!sessionDate) return;
+  if (sessionDate === getLocalDateKey()) {
+    scheduleDailyLogout();
+    return;
+  }
+
+  try {
+    const { error } = await supabaseClient.auth.signOut({ scope: "local" });
+    if (error) throw error;
+    localStorage.removeItem(SESSION_DATE_KEY);
+    setAuthenticated(false);
+    resetLinkForm();
+    linkList.replaceChildren();
+    loginForm.elements.password.value = "";
+    showMessage("已到次日 0 点，为保护账号安全已自动退出登录。");
+  } catch (error) {
+    setAuthenticated(false);
+    resetLinkForm();
+    linkList.replaceChildren();
+    loginForm.elements.password.value = "";
+    showMessage(`自动退出登录失败：${error.message}`, true);
+    dailyLogoutTimer = window.setTimeout(() => {
+      void logoutAtMidnight();
+    }, 60_000);
+  }
 }
 
 function validateUrl(value) {
@@ -87,6 +161,10 @@ function renderLinks() {
   const rows = links.filter((row) =>
     currentLinkView === "trash" ? Boolean(row.deleted_at) : !row.deleted_at,
   );
+  const visibleIds = new Set(rows.map((row) => String(row.id)));
+  selectedLinkIds.forEach((id) => {
+    if (!visibleIds.has(id)) selectedLinkIds.delete(id);
+  });
 
   if (!rows.length) {
     const emptyMessage = document.createElement("p");
@@ -95,6 +173,7 @@ function renderLinks() {
       ? "回收站是空的。"
       : "还没有网址，使用上方表单添加第一个网站。";
     linkList.append(emptyMessage);
+    updateSelectionControls();
     return;
   }
 
@@ -104,6 +183,20 @@ function renderLinks() {
 
     const details = document.createElement("div");
     details.className = "admin-link-details";
+
+    const selectControl = document.createElement("label");
+    selectControl.className = "admin-select-control";
+    const selectInput = document.createElement("input");
+    selectInput.type = "checkbox";
+    selectInput.checked = selectedLinkIds.has(String(row.id));
+    selectInput.dataset.linkId = String(row.id);
+    selectInput.setAttribute("aria-label", `选择 ${row.name}`);
+    selectInput.addEventListener("change", () => {
+      if (selectInput.checked) selectedLinkIds.add(String(row.id));
+      else selectedLinkIds.delete(String(row.id));
+      updateSelectionControls();
+    });
+    selectControl.append(selectInput);
 
     const name = document.createElement("span");
     name.className = "admin-link-name";
@@ -215,9 +308,24 @@ function renderLinks() {
       actions.append(editButton, deleteButton);
     }
 
-    item.append(details, actions);
+    item.append(selectControl, details, actions);
     linkList.append(item);
   });
+  updateSelectionControls();
+}
+
+function updateSelectionControls() {
+  const rowInputs = [...linkList.querySelectorAll(".admin-select-control input")];
+  const visibleCount = rowInputs.length;
+  const selectedCount = rowInputs.filter((input) => input.checked).length;
+  bulkActions.hidden = visibleCount === 0;
+  selectionCount.textContent = `已选 ${selectedCount} 项`;
+  bulkTrashButton.hidden = currentLinkView === "trash";
+  bulkPermanentDeleteButton.hidden = currentLinkView !== "trash";
+  bulkTrashButton.disabled = selectedCount === 0;
+  bulkPermanentDeleteButton.disabled = selectedCount === 0;
+  selectVisibleLinks.checked = visibleCount > 0 && selectedCount === visibleCount;
+  selectVisibleLinks.indeterminate = selectedCount > 0 && selectedCount < visibleCount;
 }
 
 function renderDashboardStats() {
@@ -342,6 +450,173 @@ async function updateDeletedAt(row, deletedAt, action) {
   }
 }
 
+async function performBulkAction(permanentlyDelete) {
+  const rows = links.filter((row) =>
+    selectedLinkIds.has(String(row.id)) &&
+    (permanentlyDelete ? Boolean(row.deleted_at) : !row.deleted_at),
+  );
+  if (!rows.length) {
+    showMessage("请先选择要处理的网址。", true);
+    return;
+  }
+
+  const action = permanentlyDelete ? "永久删除" : "移入回收站";
+  const confirmation = permanentlyDelete
+    ? `确定永久删除选中的 ${rows.length} 个网址吗？此操作无法撤销。`
+    : `确定将选中的 ${rows.length} 个网址移入回收站吗？之后可以恢复。`;
+  if (!window.confirm(confirmation)) return;
+
+  const ids = rows.map((row) => String(row.id));
+  const button = permanentlyDelete ? bulkPermanentDeleteButton : bulkTrashButton;
+  button.disabled = true;
+  try {
+    const request = permanentlyDelete
+      ? supabaseClient.from("links").delete().in("id", ids).select("id")
+      : supabaseClient.from("links").update({ deleted_at: new Date().toISOString() })
+          .in("id", ids).select("id");
+    const { data, error } = await request;
+    if (error) throw error;
+    const changedCount = data?.length || 0;
+    if (!changedCount) {
+      throw new Error(`没有网址成功${action}；请检查登录账号和 RLS 权限。`);
+    }
+
+    if (ids.includes(linkIdInput.value)) resetLinkForm();
+    selectedLinkIds.clear();
+    await loadLinks();
+    if (changedCount !== ids.length) {
+      showMessage(`仅${action} ${changedCount}/${ids.length} 个网址；未处理的记录可能已变更或受 RLS 限制。`, true);
+      return;
+    }
+    showMessage(`已${action} ${changedCount} 个网址。`);
+  } catch (error) {
+    showMessage(`${action}失败：${error.message}`, true);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function downloadBackup() {
+  const backup = {
+    format: "navigation-hub-backup",
+    version: 1,
+    exported_at: new Date().toISOString(),
+    links: links.map((row) => ({
+      id: String(row.id),
+      name: row.name,
+      url: row.url,
+      category: row.category,
+      description: row.description || "",
+      created_at: row.created_at,
+      click_count: String(row.click_count ?? 0),
+      deleted_at: row.deleted_at || null,
+    })),
+  };
+  const file = new Blob([JSON.stringify(backup, null, 2)], {
+    type: "application/json;charset=utf-8",
+  });
+  const downloadUrl = URL.createObjectURL(file);
+  const downloadLink = document.createElement("a");
+  downloadLink.href = downloadUrl;
+  downloadLink.download = `navigation-hub-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  downloadLink.click();
+  window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+  showMessage(`已导出 ${links.length} 个网址的 JSON 备份。`);
+}
+
+function validateBackup(data) {
+  if (
+    !data ||
+    data.format !== "navigation-hub-backup" ||
+    data.version !== 1 ||
+    !Array.isArray(data.links)
+  ) {
+    throw new Error("文件不是受支持的导航站 JSON 备份。");
+  }
+  if (data.links.length > 10000) {
+    throw new Error("备份记录超过 10,000 条，无法导入。");
+  }
+
+  const seenIds = new Set();
+  return data.links.map((row, index) => {
+    const rawId = String(row?.id ?? "");
+    const id = rawId.replace(/^0+(?=\d)/, "");
+    const name = typeof row?.name === "string" ? row.name.trim() : "";
+    const description = typeof row?.description === "string" ? row.description : "";
+    const category = String(row?.category || "");
+    const clickCount = String(row?.click_count ?? "");
+    const createdAt = String(row?.created_at || "");
+    const deletedAt = row?.deleted_at == null ? null : String(row.deleted_at);
+    if (!/^\d+$/.test(rawId) || seenIds.has(id)) {
+      throw new Error(`第 ${index + 1} 条记录的 ID 无效或重复。`);
+    }
+    if (!name || name.length > 160 || description.length > 500) {
+      throw new Error(`第 ${index + 1} 条记录的网站名称或简介无效。`);
+    }
+    if (!categoryLabels.has(category)) {
+      throw new Error(`第 ${index + 1} 条记录的网站分类无效。`);
+    }
+    if (!/^\d+$/.test(clickCount)) {
+      throw new Error(`第 ${index + 1} 条记录的访问次数无效。`);
+    }
+    if (Number.isNaN(Date.parse(createdAt)) ||
+        (deletedAt !== null && Number.isNaN(Date.parse(deletedAt)))) {
+      throw new Error(`第 ${index + 1} 条记录的时间字段无效。`);
+    }
+
+    let url;
+    try {
+      url = validateUrl(String(row.url || ""));
+    } catch {
+      throw new Error(`第 ${index + 1} 条记录的网址无效。`);
+    }
+    seenIds.add(id);
+    return {
+      id,
+      name,
+      url,
+      category,
+      description,
+      created_at: createdAt,
+      click_count: clickCount,
+      deleted_at: deletedAt,
+    };
+  });
+}
+
+async function importBackup(file) {
+  if (!file) return;
+  if (file.size > 10 * 1024 * 1024) {
+    throw new Error("备份文件不能超过 10 MB。");
+  }
+
+  const backup = JSON.parse(await file.text());
+  const records = validateBackup(backup);
+  if (!records.length) {
+    showMessage("备份文件中没有网址记录。");
+    return;
+  }
+  if (!window.confirm(
+    `将导入 ${records.length} 个网址；相同 ID 的记录会被备份覆盖，其他记录会新增。是否继续？`,
+  )) return;
+
+  let importedCount = 0;
+  for (let offset = 0; offset < records.length; offset += 100) {
+    const batch = records.slice(offset, offset + 100);
+    const { error } = await supabaseClient
+      .from("links")
+      .upsert(batch, { onConflict: "id" });
+    if (error) {
+      throw new Error(`已导入 ${importedCount}/${records.length} 条后失败：${error.message}`);
+    }
+    importedCount += batch.length;
+  }
+
+  selectedLinkIds.clear();
+  await loadLinks();
+  showMessage(`已导入 ${importedCount} 条网址记录。`);
+}
+
 function resetLinkForm() {
   linkForm.reset();
   linkIdInput.value = "";
@@ -373,6 +648,7 @@ loginForm.addEventListener("submit", async (event) => {
       throw new Error(`请使用管理员账号 ${ADMIN_EMAIL} 登录。`);
     }
 
+    localStorage.setItem(SESSION_DATE_KEY, getLocalDateKey());
     setAuthenticated(true);
     await loadLinks();
     showMessage("登录成功。");
@@ -436,6 +712,7 @@ document.querySelector("#logout-button").addEventListener("click", async () => {
   try {
     const { error } = await supabaseClient.auth.signOut();
     if (error) throw error;
+    localStorage.removeItem(SESSION_DATE_KEY);
     setAuthenticated(false);
     resetLinkForm();
     linkList.replaceChildren();
@@ -446,11 +723,44 @@ document.querySelector("#logout-button").addEventListener("click", async () => {
   }
 });
 
+themeToggle.addEventListener("click", () => {
+  setTheme(!document.body.classList.contains("dark-theme"));
+});
+
+exportBackupButton.addEventListener("click", downloadBackup);
+importBackupButton.addEventListener("click", () => backupFileInput.click());
+backupFileInput.addEventListener("change", async () => {
+  try {
+    await importBackup(backupFileInput.files[0]);
+  } catch (error) {
+    showMessage(`备份导入失败：${error.message}`, true);
+  } finally {
+    backupFileInput.value = "";
+  }
+});
+
+selectVisibleLinks.addEventListener("change", () => {
+  linkList.querySelectorAll(".admin-select-control input").forEach((input) => {
+    if (selectVisibleLinks.checked) selectedLinkIds.add(input.dataset.linkId);
+    else selectedLinkIds.delete(input.dataset.linkId);
+    input.checked = selectVisibleLinks.checked;
+  });
+  updateSelectionControls();
+});
+
+bulkTrashButton.addEventListener("click", () => {
+  void performBulkAction(false);
+});
+bulkPermanentDeleteButton.addEventListener("click", () => {
+  void performBulkAction(true);
+});
+
 cancelEditButton.addEventListener("click", resetLinkForm);
 
 linkViewButtons.forEach((button) => {
   button.addEventListener("click", () => {
     currentLinkView = button.dataset.linkView;
+    selectedLinkIds.clear();
     linkViewButtons.forEach((viewButton) => {
       const isActive = viewButton === button;
       viewButton.classList.toggle("is-active", isActive);
@@ -461,6 +771,8 @@ linkViewButtons.forEach((button) => {
     renderLinks();
   });
 });
+
+setTheme(localStorage.getItem("shiguang-theme") === "dark");
 
 async function initializeAdmin() {
   if (!supabaseClient) {
@@ -479,6 +791,18 @@ async function initializeAdmin() {
       showMessage(`当前会话不是管理员账号，请使用 ${ADMIN_EMAIL} 登录。`, true);
       return;
     }
+    if (isAuthenticated) {
+      const sessionDate = localStorage.getItem(SESSION_DATE_KEY);
+      if (sessionDate && sessionDate !== getLocalDateKey()) {
+        const { error: signOutError } = await supabaseClient.auth.signOut({ scope: "local" });
+        if (signOutError) throw signOutError;
+        localStorage.removeItem(SESSION_DATE_KEY);
+        setAuthenticated(false);
+        showMessage("已到次日 0 点，为保护账号安全请重新登录。");
+        return;
+      }
+      if (!sessionDate) localStorage.setItem(SESSION_DATE_KEY, getLocalDateKey());
+    }
     setAuthenticated(isAuthenticated);
     if (isAuthenticated) await loadLinks();
   } catch (error) {
@@ -487,3 +811,13 @@ async function initializeAdmin() {
 }
 
 initializeAdmin();
+
+document.addEventListener("visibilitychange", () => {
+  if (
+    !document.hidden &&
+    !dashboard.hidden &&
+    localStorage.getItem(SESSION_DATE_KEY) !== getLocalDateKey()
+  ) {
+    void logoutAtMidnight();
+  }
+});
