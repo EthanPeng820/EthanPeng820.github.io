@@ -504,6 +504,41 @@
   gap: 6px;
 }
 
+.admin-link-search {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.admin-link-search label {
+  color: #656d76;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.admin-link-search input {
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 1px solid #d1d9e0;
+  border-radius: 6px;
+  outline: none;
+  background: #ffffff;
+  color: #1f2328;
+  font: inherit;
+  font-size: 12px;
+  transition: border-color 130ms ease, box-shadow 130ms ease;
+}
+
+.admin-link-search input:focus {
+  border-color: #0969da;
+  box-shadow: 0 0 0 3px rgb(9 105 218 / 14%);
+}
+
+.admin-link-search input::placeholder {
+  color: #6e7781;
+}
+
 .admin-data-actions,
 .admin-bulk-actions {
   display: flex;
@@ -823,14 +858,16 @@
 
 .admin-page.dark-theme .admin-form input,
 .admin-page.dark-theme .admin-form select,
-.admin-page.dark-theme .admin-form textarea {
+.admin-page.dark-theme .admin-form textarea,
+.admin-page.dark-theme .admin-link-search input {
   border-color: #30363d;
   background: #0d1117;
   color: #e6edf3;
 }
 
 .admin-page.dark-theme .admin-form input::placeholder,
-.admin-page.dark-theme .admin-form textarea::placeholder {
+.admin-page.dark-theme .admin-form textarea::placeholder,
+.admin-page.dark-theme .admin-link-search input::placeholder {
   color: #8b949e;
 }
 

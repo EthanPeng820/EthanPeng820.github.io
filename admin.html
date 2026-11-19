@@ -7,7 +7,7 @@
     <title>Navigation Hub网址管理</title>
     <link rel="stylesheet" href="./styles.css" />
     <link rel="stylesheet" href="./admin.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer crossorigin="anonymous"></script>
     <script src="./supabase-config.js" defer></script>
     <script src="./admin.js" defer></script>
   </head>
@@ -149,6 +149,16 @@
                   回收站
                 </button>
               </div>
+            </div>
+            <div class="admin-link-search">
+              <label for="link-search">搜索网站</label>
+              <input
+                id="link-search"
+                type="search"
+                autocomplete="off"
+                placeholder="按名称、网址、简介或分类搜索"
+                aria-controls="admin-link-list"
+              />
             </div>
             <div class="admin-data-actions">
               <button class="admin-secondary-button" id="export-backup-button" type="button">下载 JSON 备份</button>

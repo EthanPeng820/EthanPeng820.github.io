@@ -1,10 +1,46 @@
 // 管理页仅使用 anon key 登录，所有写操作仍必须通过 Supabase Auth 和 RLS。
-const supabaseClient = window.supabase?.createClient && window.SUPABASE_CONFIG
+let supabaseClient = window.supabase?.createClient && window.SUPABASE_CONFIG
   ? window.supabase.createClient(
       window.SUPABASE_CONFIG.url,
       window.SUPABASE_CONFIG.anonKey,
     )
   : null;
+
+const SUPABASE_FALLBACK_SOURCES = [
+  "https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js",
+];
+
+function loadExternalScript(source) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = source;
+    script.async = true;
+    script.onload = resolve;
+    script.onerror = () => reject(new Error(`无法加载 ${source}`));
+    document.head.append(script);
+  });
+}
+
+async function ensureSupabaseClient() {
+  if (supabaseClient) return supabaseClient;
+
+  for (const source of SUPABASE_FALLBACK_SOURCES) {
+    try {
+      await loadExternalScript(source);
+      if (window.supabase?.createClient && window.SUPABASE_CONFIG) {
+        supabaseClient = window.supabase.createClient(
+          window.SUPABASE_CONFIG.url,
+          window.SUPABASE_CONFIG.anonKey,
+        );
+        return supabaseClient;
+      }
+    } catch (error) {
+      console.warn("Supabase 备用脚本加载失败：", error);
+    }
+  }
+
+  return null;
+}
 
 const ADMIN_EMAIL = "EthanPeng820@163.com";
 const SESSION_DATE_KEY = "navigation-hub-admin-session-date";
@@ -23,6 +59,7 @@ const linkFormTitle = document.querySelector("#link-form-title");
 const saveLinkButton = document.querySelector("#save-link-button");
 const cancelEditButton = document.querySelector("#cancel-edit-button");
 const linkViewButtons = [...document.querySelectorAll("[data-link-view]")];
+const linkSearchInput = document.querySelector("#link-search");
 const themeToggle = document.querySelector("#admin-theme-toggle");
 const bulkActions = document.querySelector("#admin-bulk-actions");
 const selectionCount = document.querySelector("#selection-count");
@@ -158,9 +195,18 @@ function formatCollectedAt(value) {
 
 function renderLinks() {
   linkList.replaceChildren();
-  const rows = links.filter((row) =>
-    currentLinkView === "trash" ? Boolean(row.deleted_at) : !row.deleted_at,
-  );
+  const searchTerm = linkSearchInput.value.trim().toLocaleLowerCase("zh-CN");
+  const rows = links.filter((row) => {
+    if (currentLinkView === "trash" ? !row.deleted_at : Boolean(row.deleted_at)) return false;
+    if (!searchTerm) return true;
+    const searchableText = [
+      row.name,
+      row.url,
+      row.description,
+      categoryLabels.get(row.category) || "全部网站",
+    ].join(" ").toLocaleLowerCase("zh-CN");
+    return searchableText.includes(searchTerm);
+  });
   const visibleIds = new Set(rows.map((row) => String(row.id)));
   selectedLinkIds.forEach((id) => {
     if (!visibleIds.has(id)) selectedLinkIds.delete(id);
@@ -169,9 +215,11 @@ function renderLinks() {
   if (!rows.length) {
     const emptyMessage = document.createElement("p");
     emptyMessage.className = "admin-empty";
-    emptyMessage.textContent = currentLinkView === "trash"
-      ? "回收站是空的。"
-      : "还没有网址，使用上方表单添加第一个网站。";
+    emptyMessage.textContent = searchTerm
+      ? `没有找到与“${linkSearchInput.value.trim()}”匹配的网站。`
+      : currentLinkView === "trash"
+        ? "回收站是空的。"
+        : "还没有网址，使用上方表单添加第一个网站。";
     linkList.append(emptyMessage);
     updateSelectionControls();
     return;
@@ -627,7 +675,7 @@ function resetLinkForm() {
 
 loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  if (!supabaseClient) {
+  if (!await ensureSupabaseClient()) {
     showMessage("Supabase 客户端未加载，请检查网络连接或页面配置。", true);
     return;
   }
@@ -757,6 +805,8 @@ bulkPermanentDeleteButton.addEventListener("click", () => {
 
 cancelEditButton.addEventListener("click", resetLinkForm);
 
+linkSearchInput.addEventListener("input", renderLinks);
+
 linkViewButtons.forEach((button) => {
   button.addEventListener("click", () => {
     currentLinkView = button.dataset.linkView;
@@ -775,7 +825,7 @@ linkViewButtons.forEach((button) => {
 setTheme(localStorage.getItem("shiguang-theme") === "dark");
 
 async function initializeAdmin() {
-  if (!supabaseClient) {
+  if (!await ensureSupabaseClient()) {
     showMessage("Supabase 客户端未加载，请检查网络连接或页面配置。", true);
     return;
   }
