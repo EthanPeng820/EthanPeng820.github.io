@@ -80,8 +80,27 @@ a {
   transition: width 220ms ease, padding 220ms ease;
 }
 
-.brand {
+.topbar-brand-group {
   grid-area: brand;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.topbar-brand-group .site-uptime {
+  margin: 0 0 0 43px;
+  font-size: 9px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.topbar-brand-group .site-uptime time {
+  font-size: 9px;
+}
+
+.brand {
   display: flex;
   min-width: 0;
   align-items: center;
@@ -794,6 +813,21 @@ body.sidebar-collapsed {
   font-size: 12px;
   line-height: 1.6;
   overflow-wrap: anywhere;
+}
+
+.site-uptime {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: -4px 0 14px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.site-uptime time {
+  color: var(--accent);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
 }
 
 .data-status.is-error {

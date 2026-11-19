@@ -40,6 +40,7 @@ const externalSearchSources = new Map([
   ["google", { action: "https://www.google.com/search", parameter: "q" }],
   ["yandex", { action: "https://yandex.com/search/", parameter: "text" }],
 ]);
+const SITE_LAUNCH_TIME = new Date("2026-11-15T08:20:00+08:00");
 let bookmarks = [];
 let selectedCategory = "all";
 let searchQuery = "";
@@ -293,6 +294,21 @@ async function recordBookmarkClick(linkId) {
   }
 }
 
+function formatUptime(milliseconds) {
+  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1_000));
+  const days = Math.floor(totalSeconds / 86_400);
+  const hours = Math.floor((totalSeconds % 86_400) / 3_600);
+  const minutes = Math.floor((totalSeconds % 3_600) / 60);
+  const seconds = totalSeconds % 60;
+  return `${days}天${hours}时${minutes}分${seconds}秒`;
+}
+
+function updateSiteUptime() {
+  const uptime = document.querySelector("#site-uptime");
+  if (!uptime) return;
+  uptime.textContent = formatUptime(Date.now() - SITE_LAUNCH_TIME.getTime());
+}
+
 // 更新公历、农历和数字时间。每秒调用一次以显示秒数。
 function updateClock() {
   const now = new Date();
@@ -502,7 +518,9 @@ document.addEventListener("keydown", (event) => {
 renderCategories();
 loadBookmarks();
 updateClock();
+updateSiteUptime();
 setInterval(updateClock, 1_000);
+setInterval(updateSiteUptime, 1_000);
 setTheme(localStorage.getItem("shiguang-theme") === "dark");
 setSidebarCollapsed(sidebarCollapsed);
 compactSidebarLayout.addEventListener("change", (event) => {

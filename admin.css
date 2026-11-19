@@ -155,6 +155,21 @@
   font-size: 13px;
 }
 
+.admin-uptime {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 8px 0 0;
+  color: #656d76;
+  font-size: 12px;
+}
+
+.admin-uptime time {
+  color: #0969da;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
 .admin-dashboard-actions {
   justify-content: flex-end;
 }
@@ -805,6 +820,7 @@
 .admin-page.dark-theme .admin-brand-group p,
 .admin-page.dark-theme .admin-intro,
 .admin-page.dark-theme .admin-live-status,
+.admin-page.dark-theme .admin-uptime,
 .admin-page.dark-theme .admin-eyebrow,
 .admin-page.dark-theme .admin-metric-top,
 .admin-page.dark-theme .admin-metric-card > small,

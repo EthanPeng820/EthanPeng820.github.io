@@ -19,13 +19,19 @@
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="#" aria-label="Ethan's 导航站首页">
-        <span class="brand-mark" aria-hidden="true">E</span>
-        <span class="brand-copy">
-          <span class="brand-name">Navigation Hub</span>
-          <span class="brand-caption">Ethan Peng</span>
-        </span>
-      </a>
+      <div class="topbar-brand-group">
+        <a class="brand" href="#" aria-label="Ethan's 导航站首页">
+          <span class="brand-mark" aria-hidden="true">E</span>
+          <span class="brand-copy">
+            <span class="brand-name">Navigation Hub</span>
+            <span class="brand-caption">Ethan Peng</span>
+          </span>
+        </a>
+        <p class="site-uptime" role="status" aria-live="polite">
+          <span class="site-uptime-label">本站已运行</span>
+          <time id="site-uptime" datetime="2026-11-15T08:20:00+08:00">计算中...</time>
+        </p>
+      </div>
 
       <section class="web-search-section" aria-label="外部搜索">
         <form class="web-search-box" id="web-search-form" role="search" target="_blank" rel="noopener">
@@ -156,9 +162,9 @@
               <span class="section-kicker">QUICK ACCESS</span>
               <h2 id="directory-title">常用网站</h2>
             </div>
-            <span class="link-count" id="link-count"></span>
-          </div>
-          <p class="data-status" id="data-status" role="status" aria-live="polite" hidden></p>
+          <span class="link-count" id="link-count"></span>
+        </div>
+        <p class="data-status" id="data-status" role="status" aria-live="polite" hidden></p>
           <div class="bookmark-grid" id="bookmark-grid" aria-live="polite"></div>
           <p class="empty-state" id="empty-state" hidden>没有找到相关网站，试试其他关键词吧。</p>
         </section>

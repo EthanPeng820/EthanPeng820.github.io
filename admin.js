@@ -43,6 +43,7 @@ async function ensureSupabaseClient() {
 }
 
 const ADMIN_EMAIL = "EthanPeng820@163.com";
+const SITE_LAUNCH_TIME = new Date("2026-11-15T08:20:00+08:00");
 const SESSION_DATE_KEY = "navigation-hub-admin-session-date";
 const loginPanel = document.querySelector("#login-panel");
 const dashboard = document.querySelector("#dashboard");
@@ -94,6 +95,21 @@ let currentLinkView = "active";
 let dailyLogoutTimer = null;
 let messageTimer = null;
 const selectedLinkIds = new Set();
+
+function formatUptime(milliseconds) {
+  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1_000));
+  const days = Math.floor(totalSeconds / 86_400);
+  const hours = Math.floor((totalSeconds % 86_400) / 3_600);
+  const minutes = Math.floor((totalSeconds % 3_600) / 60);
+  const seconds = totalSeconds % 60;
+  return `${days}天${hours}时${minutes}分${seconds}秒`;
+}
+
+function updateSiteUptime() {
+  const uptime = document.querySelector("#admin-site-uptime");
+  if (!uptime) return;
+  uptime.textContent = formatUptime(Date.now() - SITE_LAUNCH_TIME.getTime());
+}
 
 function showMessage(message, isError = false) {
   window.clearTimeout(messageTimer);
@@ -823,6 +839,8 @@ linkViewButtons.forEach((button) => {
 });
 
 setTheme(localStorage.getItem("shiguang-theme") === "dark");
+updateSiteUptime();
+window.setInterval(updateSiteUptime, 1_000);
 
 async function initializeAdmin() {
   if (!await ensureSupabaseClient()) {
