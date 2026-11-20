@@ -6,14 +6,14 @@
   --text: #1f2328;
   --muted: #656d76;
   --line: #d1d9e0;
-  --accent: #0969da;
-  --accent-strong: #0550ae;
+  --accent: #6d28d9;
+  --accent-strong: #5b21b6;
   --sidebar: #f6f8fa;
   --sidebar-text: #1f2328;
   --sidebar-muted: #59636e;
   --sidebar-border: #d1d9e0;
   --sidebar-hover: #eaeef2;
-  --sidebar-active: #ddf4ff;
+  --sidebar-active: #ede9fe;
   --sidebar-width: 264px;
   --topbar-height: 64px;
   --danger: #cf222e;
@@ -24,15 +24,15 @@
 
 .dark-theme .search-submit,
 .dark-theme .web-search-submit {
-  border-color: #218bff;
-  background: #54aeff;
+  border-color: #8b5cf6;
+  background: #7c3aed;
   color: #ffffff;
 }
 
 .dark-theme .search-submit:hover,
 .dark-theme .web-search-submit:hover {
-  border-color: #0969da;
-  background: #0969da;
+  border-color: #6d28d9;
+  background: #6d28d9;
 }
 
 * {
@@ -160,8 +160,8 @@ a {
 }
 
 .search-box:focus-within {
-  border-color: #0969da;
-  box-shadow: 0 0 0 3px rgb(9 105 218 / 14%);
+  border-color: #6d28d9;
+  box-shadow: 0 0 0 3px rgb(109 40 217 / 14%);
 }
 
 .sidebar-search-section {
@@ -231,9 +231,9 @@ a {
   justify-content: center;
   gap: 6px;
   padding: 0 9px;
-  border: 1px solid #218bff;
+  border: 1px solid #8b5cf6;
   border-radius: 6px;
-  background: #54aeff;
+  background: #7c3aed;
   color: #ffffff;
   cursor: pointer;
   font-size: 12px;
@@ -242,8 +242,8 @@ a {
 }
 
 .search-submit:hover {
-  border-color: #0969da;
-  background: #0969da;
+  border-color: #6d28d9;
+  background: #6d28d9;
 }
 
 .web-search-box {
@@ -260,8 +260,8 @@ a {
 }
 
 .web-search-box:focus-within {
-  border-color: #0969da;
-  box-shadow: 0 0 0 3px rgb(9 105 218 / 14%);
+  border-color: #6d28d9;
+  box-shadow: 0 0 0 3px rgb(109 40 217 / 14%);
 }
 
 .web-search-box select,
@@ -297,9 +297,9 @@ a {
 .web-search-submit {
   min-height: 30px;
   padding: 0 12px;
-  border: 1px solid #218bff;
+  border: 1px solid #8b5cf6;
   border-radius: 6px;
-  background: #54aeff;
+  background: #7c3aed;
   color: #ffffff;
   cursor: pointer;
   font-size: 12px;
@@ -308,8 +308,8 @@ a {
 }
 
 .web-search-submit:hover {
-  border-color: #0969da;
-  background: #0969da;
+  border-color: #6d28d9;
+  background: #6d28d9;
 }
 
 .sidebar-section-label {
@@ -348,14 +348,14 @@ a {
 }
 
 .category-button[aria-pressed="true"] {
-  border-color: #b6e3ff;
+  border-color: #ddd6fe;
   background: var(--sidebar-active);
-  color: #0550ae;
+  color: #5b21b6;
   font-weight: 600;
 }
 
 .dark-theme .category-button[aria-pressed="true"] {
-  border-color: #1f6feb;
+  border-color: #8b5cf6;
   color: #c9d1d9;
 }
 
@@ -488,8 +488,8 @@ a {
   place-items: center;
   border: 1px solid var(--sidebar-border);
   border-radius: 50%;
-  background: #ddf4ff;
-  color: #0550ae;
+  background: #ede9fe;
+  color: #5b21b6;
   font-size: 13px;
   font-weight: 600;
 }
@@ -857,7 +857,7 @@ body.sidebar-collapsed {
 }
 
 .bookmark-card:hover {
-  border-color: #80bfff;
+  border-color: #a78bfa;
   background: #f6f8fa;
 }
 
@@ -971,15 +971,15 @@ body.sidebar-collapsed {
   --text: #e6edf3;
   --muted: #9198a1;
   --line: #30363d;
-  --accent: #4493f8;
-  --accent-strong: #6cb6ff;
+  --accent: #a78bfa;
+  --accent-strong: #c4b5fd;
   --danger: #ff7b72;
   --sidebar: #161b22;
   --sidebar-text: #e6edf3;
   --sidebar-muted: #9198a1;
   --sidebar-border: #30363d;
   --sidebar-hover: #21262d;
-  --sidebar-active: #0c2d6b;
+  --sidebar-active: #2e1065;
 }
 
 .dark-theme .topbar {
@@ -994,7 +994,7 @@ body.sidebar-collapsed {
 }
 
 .dark-theme .category-button[aria-pressed="true"] {
-  border-color: #1f6feb;
+  border-color: #8b5cf6;
   color: #c9d1d9;
 }
 
@@ -1005,8 +1005,8 @@ body.sidebar-collapsed {
 }
 
 .dark-theme .profile-avatar {
-  border-color: #1f6feb;
-  background: #0c2d6b;
+  border-color: #8b5cf6;
+  background: #2e1065;
   color: #c9d1d9;
 }
 
@@ -1017,7 +1017,7 @@ body.sidebar-collapsed {
 }
 
 .dark-theme .bookmark-card:hover {
-  border-color: #1f6feb;
+  border-color: #8b5cf6;
   background: #161b22;
 }
 
@@ -1041,7 +1041,7 @@ body.sidebar-collapsed {
 .sidebar-github-link:focus-visible,
 .sidebar-toggle:focus-visible,
 .web-search-submit:focus-visible {
-  outline: 2px solid #0969da;
+  outline: 2px solid #6d28d9;
   outline-offset: 2px;
 }
 

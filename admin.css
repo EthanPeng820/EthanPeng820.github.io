@@ -44,7 +44,7 @@
   height: 38px;
   place-items: center;
   border-radius: 6px;
-  background: #0969da;
+  background: #6d28d9;
   color: #ffffff;
   font-size: 17px;
   font-weight: 700;
@@ -110,13 +110,13 @@
 }
 
 .admin-link-url {
-  color: #0969da;
+  color: #6d28d9;
   font-size: 12px;
   text-decoration: none;
 }
 
 .admin-link-url:hover {
-  color: #0550ae;
+  color: #5b21b6;
   text-decoration: underline;
 }
 
@@ -165,7 +165,7 @@
 }
 
 .admin-uptime time {
-  color: #0969da;
+  color: #6d28d9;
   font-weight: 650;
   font-variant-numeric: tabular-nums;
 }
@@ -216,9 +216,9 @@
   font-weight: 700;
 }
 
-.admin-metric-icon.is-blue {
-  background: #ddf4ff;
-  color: #0969da;
+.admin-metric-icon.is-primary {
+  background: #ede9fe;
+  color: #6d28d9;
 }
 
 .admin-metric-icon.is-green {
@@ -321,7 +321,7 @@
   height: 100%;
   min-width: 5px;
   border-radius: inherit;
-  background: #54aeff;
+  background: #7c3aed;
 }
 
 .admin-chart-count {
@@ -425,7 +425,7 @@
 }
 
 .admin-view-button.is-active {
-  background: #54aeff;
+  background: #7c3aed;
   color: #ffffff;
   font-weight: 600;
 }
@@ -454,12 +454,12 @@
 .admin-select-all input {
   width: 16px;
   height: 16px;
-  accent-color: #0969da;
+  accent-color: #6d28d9;
   cursor: pointer;
 }
 
 .admin-link-row:hover {
-  border-color: #80bfff;
+  border-color: #a78bfa;
   background: #f6f8fa;
 }
 
@@ -546,8 +546,8 @@
 }
 
 .admin-link-search input:focus {
-  border-color: #0969da;
-  box-shadow: 0 0 0 3px rgb(9 105 218 / 14%);
+  border-color: #6d28d9;
+  box-shadow: 0 0 0 3px rgb(109 40 217 / 14%);
 }
 
 .admin-link-search input::placeholder {
@@ -614,13 +614,13 @@
 .admin-primary-button {
   min-height: 38px;
   padding: 0 14px;
-  background: #54aeff;
+  background: #7c3aed;
   color: #ffffff;
   font-size: 12px;
 }
 
 .admin-primary-button:hover {
-  background: #218bff;
+  background: #8b5cf6;
 }
 
 .admin-secondary-button,
@@ -653,8 +653,8 @@
   height: 29px;
   place-items: center;
   border-radius: 6px;
-  background: #ddf4ff;
-  color: #0969da;
+  background: #ede9fe;
+  color: #6d28d9;
   font-size: 19px;
 }
 
@@ -696,8 +696,8 @@
 .admin-form input:focus,
 .admin-form select:focus,
 .admin-form textarea:focus {
-  border-color: #0969da;
-  box-shadow: 0 0 0 3px rgb(9 105 218 / 14%);
+  border-color: #6d28d9;
+  box-shadow: 0 0 0 3px rgb(109 40 217 / 14%);
 }
 
 .admin-form input::placeholder,
@@ -755,7 +755,7 @@
   margin-bottom: 20px;
   place-items: center;
   border-radius: 6px;
-  background: #ddf4ff;
+  background: #ede9fe;
   font-size: 20px;
 }
 
@@ -788,7 +788,7 @@
 .admin-page input:focus-visible,
 .admin-page select:focus-visible,
 .admin-page textarea:focus-visible {
-  outline: 2px solid #0969da;
+  outline: 2px solid #6d28d9;
   outline-offset: 2px;
 }
 
@@ -851,7 +851,7 @@
 .admin-page.dark-theme .admin-secondary-button:hover,
 .admin-page.dark-theme .admin-edit-button:hover,
 .admin-page.dark-theme .admin-link-row:hover {
-  border-color: #58a6ff;
+  border-color: #a78bfa;
   background: #1c2128;
 }
 
@@ -868,7 +868,7 @@
 }
 
 .admin-page.dark-theme .admin-view-button.is-active {
-  background: #54aeff;
+  background: #7c3aed;
   color: #ffffff;
 }
 
@@ -897,7 +897,7 @@
 }
 
 .admin-page.dark-theme .admin-link-url {
-  color: #58a6ff;
+  color: #a78bfa;
 }
 
 .admin-page.dark-theme .admin-delete-button {
@@ -923,11 +923,11 @@
   color: #ff7b72;
 }
 
-.admin-page.dark-theme .admin-metric-icon.is-blue,
+.admin-page.dark-theme .admin-metric-icon.is-primary,
 .admin-page.dark-theme .admin-create-icon,
 .admin-page.dark-theme .admin-login-icon {
-  background: #0c2d6b;
-  color: #58a6ff;
+  background: #2e1065;
+  color: #a78bfa;
 }
 
 .admin-page.dark-theme .admin-metric-icon.is-green {

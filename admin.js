@@ -128,7 +128,7 @@ function setTheme(isDark) {
   document.body.classList.toggle("dark-theme", isDark);
   themeToggle.setAttribute("aria-label", isDark ? "切换浅色主题" : "切换深色主题");
   themeToggle.title = isDark ? "切换浅色主题" : "切换深色主题";
-  document.querySelector('meta[name="theme-color"]').content = isDark ? "#0d1117" : "#f6f8fa";
+  document.querySelector('meta[name="theme-color"]').content = isDark ? "#2e1065" : "#6d28d9";
   localStorage.setItem("shiguang-theme", isDark ? "dark" : "light");
 }
 
